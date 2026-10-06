@@ -266,5 +266,93 @@
 
         });
     </script>
+
+<script>
+    (function () {
+        // ============================================
+        // 1. BLOQUEAR CLIC DERECHO
+        // ============================================
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // ============================================
+        // 2. BLOQUEAR ATAJOS DE TECLADO
+        // ============================================
+        document.addEventListener('keydown', function (e) {
+            const key = (e.key || '').toLowerCase();
+            const ctrl = e.ctrlKey || e.metaKey;
+            const shift = e.shiftKey;
+
+            // F12 (DevTools)
+            if (key === 'f12') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+Shift+I / J / C (DevTools)
+            if (ctrl && shift && (key === 'i' || key === 'j' || key === 'c')) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+U (Ver código fuente)
+            if (ctrl && key === 'u') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+S (Guardar página)
+            if (ctrl && key === 's') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+Shift+K (Consola Firefox)
+            if (ctrl && shift && key === 'k') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+Shift+E (Network Firefox)
+            if (ctrl && shift && key === 'e') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+Shift+S (Guardar como)
+            if (ctrl && shift && key === 's') {
+                e.preventDefault();
+                return false;
+            }
+
+            // Ctrl+Shift+C (Inspector Firefox)
+            if (ctrl && shift && key === 'c') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // ============================================
+        // 3. BLOQUEAR ARRASTRAR
+        // ============================================
+        document.addEventListener('dragstart', function (e) {
+            e.preventDefault();
+        });
+
+        // ============================================
+        // 4. ANTI-IFRAME (evita que embeban tu página)
+        // ============================================
+        if (window.top !== window.self) {
+            try {
+                window.top.location = window.self.location;
+            } catch (e) {
+                document.body.innerHTML = '';
+            }
+        }
+    })();
+</script>
+    
 </body>
 </html>
