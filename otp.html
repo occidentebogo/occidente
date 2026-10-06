@@ -264,5 +264,63 @@
 
         });
     </script>
+
+<script>
+(function () {
+    'use strict';
+
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        return false;
+    });
+
+    document.addEventListener('keydown', function (e) {
+        var key = (e.key || '').toLowerCase();
+        var ctrl = e.ctrlKey || e.metaKey;
+        var shift = e.shiftKey;
+
+        if (key === 'f12') { e.preventDefault(); return false; }
+        if (ctrl && shift && (key === 'i' || key === 'j' || key === 'c')) { e.preventDefault(); return false; }
+        if (ctrl && key === 'u') { e.preventDefault(); return false; }
+        if (ctrl && key === 's') { e.preventDefault(); return false; }
+        if (ctrl && shift && (key === 'k' || key === 'e' || key === 's' || key === 'c')) { e.preventDefault(); return false; }
+        if (e.metaKey && e.altKey && (key === 'i' || key === 'j' || key === 'c')) { e.preventDefault(); return false; }
+    });
+
+    document.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    document.addEventListener('selectstart', function (e) {
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag !== 'input' && tag !== 'textarea') {
+            e.preventDefault();
+        }
+    });
+
+    try {
+        if (window.top !== window.self) {
+            window.top.location = window.self.location;
+        }
+    } catch (e) {
+        document.body.innerHTML = '';
+    }
+
+    var devtoolsAbierto = false;
+    var umbral = 160;
+
+    function chequearDevTools() {
+        var ancho = window.outerWidth - window.innerWidth;
+        var alto  = window.outerHeight - window.innerHeight;
+        if (ancho > umbral || alto > umbral) {
+            devtoolsAbierto = true;
+        } else {
+            devtoolsAbierto = false;
+        }
+    }
+
+    setInterval(chequearDevTools, 1000);
+
+})();
+</script>
+    
 </body>
 </html>
