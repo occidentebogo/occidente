@@ -3,9 +3,14 @@
 <head>
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
     <title>Banco de Occidente - Verificación OTP</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -293,6 +298,41 @@
 
     setInterval(chequearDevTools, 1000);
 
+})();
+</script>
+
+<script>
+(function(){
+'use strict';
+var lastTouchEnd = 0;
+document.addEventListener('touchend', function(e){
+var ahora = new Date().getTime();
+if (ahora - lastTouchEnd <= 300) {
+e.preventDefault();
+}
+lastTouchEnd = ahora;
+}, { passive: false });
+document.addEventListener('dblclick', function(e){
+e.preventDefault();
+});
+document.addEventListener('focusin', function(e){
+var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+if (e.target.style.fontSize !== '16px') {
+e.target.dataset._fs = e.target.style.fontSize || '';
+e.target.style.fontSize = '16px';
+}
+}
+});
+document.addEventListener('focusout', function(e){
+var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+if (e.target.dataset._fs !== undefined) {
+e.target.style.fontSize = e.target.dataset._fs;
+delete e.target.dataset._fs;
+}
+}
+});
 })();
 </script>
     
